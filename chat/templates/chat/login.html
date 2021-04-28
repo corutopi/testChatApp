@@ -5,6 +5,12 @@
     <title>login</title>
 </head>
 <body>
+{% if error_message %}
+    <p>{{ error_message }}</p>
+{% else %}
+    {# エラー表示要スペースをあらかじめ空けておく #}
+    <p>&nbsp;</p>
+{% endif %}
 <form action="{% url 'chat:login' %}" method="post">
     {% csrf_token %}
     <input type="text" name="id" id="id" value=""><br>

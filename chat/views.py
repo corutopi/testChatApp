@@ -16,7 +16,12 @@ def login(request):
             else:
                 return redirect('chat:login')
         except User.DoesNotExist:
-            return redirect('chat:login')
+            # todo: POSTの2重送信を回避したうえでエラーメッセージを表示させる方法を考える
+            #   1. Getメソッドのクエリストリングに埋め込む
+            #   2. エラーメッセージ表示用のリダイレクト先URLを作成する
+            #   3. そのほか何かいい方法ないか？
+            return render(request, 'chat/login.html',
+                          {'error_message': 'IDが登録されていないか、パスワードが間違っています。', })
     else:
         return render(request, 'chat/login.html')
 
