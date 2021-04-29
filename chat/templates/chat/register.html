@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>login</title>
+    <title>register</title>
 </head>
 <body>
 {% if error_message %}
@@ -11,15 +11,12 @@
     {# エラー表示用スペースをあらかじめ空けておく #}
     <p>&nbsp;</p>
 {% endif %}
-<form action="{% url 'chat:login' %}" method="post">
+<form action="{% url 'chat:register' %}" method="post">
     {% csrf_token %}
     <input type="text" name="id" id="id" value=""><br>
     <input type="password" name="passwd" id="passwd" value=""><br>
-    <input type="submit" value="Login">
+    <input type="password" name="passwd_renter" id="passwd_renter" value=""><br>
+    <input type="submit" value="register">
 </form>
-<form action="{% url 'chat:register' %}" method="get">
-    <input type="submit" value="新規登録はこちら">
-</form>
-
 </body>
 </html>
