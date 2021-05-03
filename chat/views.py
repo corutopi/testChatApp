@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import User, AppToken
 
@@ -16,7 +17,9 @@ def login(request):
             if user_passwd == u.user_passwd:
                 at = _make_apptoken(user_id)
                 hrr = redirect('chat:mypage')  # HttpResponseRedirect
-                hrr.set_cookie(key='apptoken', value=at.app_token,
+                hrr.set_cookie(key='app_token', value=at.app_token,
+                               expires=at.ttl)
+                hrr.set_cookie(key='user_id', value=at.user_id.user_id,
                                expires=at.ttl)
                 return hrr
             else:
@@ -68,6 +71,22 @@ def registered(request):
     return render(request, 'chat/registered.html')
 
 
+def check_logged_in(func):
+    def warapper(*args, **kwargs):
+        request = args[0]
+        user_id = request.COOKIES.get('user_id')
+        app_token = request.COOKIES.get('app_token')
+        try:
+            at = AppToken.objects.get(user_id=User.objects.get(user_id=user_id),
+                                      app_token=app_token)
+        except ObjectDoesNotExist:
+            return redirect('chat:login')
+        return func(*args, **kwargs)
+
+    return warapper
+
+
+@check_logged_in
 def mypage(request):
     return HttpResponse('MyPage View')
 
@@ -96,5 +115,3 @@ def _random_str(length, choice=''):
     if choice == '':
         choice = string.ascii_letters + string.digits
     return ''.join(choices(choice, k=length))
-
-
