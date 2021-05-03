@@ -1,7 +1,9 @@
+from datetime import datetime, timedelta
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 
-from .models import User
+from .models import User, AppToken
 
 
 def login(request):
@@ -12,12 +14,16 @@ def login(request):
             user_passwd = request.POST['passwd']
             u = User.objects.get(pk=user_id)
             if user_passwd == u.user_passwd:
-                return redirect('chat:mypage')
+                at = _make_apptoken(user_id)
+                hrr = redirect('chat:mypage')  # HttpResponseRedirect
+                hrr.set_cookie(key='apptoken', value=at.app_token,
+                               expires=at.ttl)
+                return hrr
             else:
                 pass
         except User.DoesNotExist:
             # todo: POSTの2重送信を回避したうえでエラーメッセージを表示させる方法を考える
-            #   1. Getメソッドのクエリストリングに埋め込む
+            #   1. リダイレクトURLのクエリストリングに埋め込む
             #   2. エラーメッセージ表示用のリダイレクト先URLを作成する
             #   3. そのほか何かいい方法ないか？
             pass
@@ -64,3 +70,31 @@ def registered(request):
 
 def mypage(request):
     return HttpResponse('MyPage View')
+
+
+def _make_apptoken(user_id):
+    """トークンを作成する"""
+    TOKEN_LENGTH = 30
+    TOKEN_TTL_DATE = 7
+
+    us = AppToken.objects.filter(user_id=user_id)
+    token_list = [u.app_token for u in us]
+    token = _random_str(TOKEN_LENGTH)
+    while token in token_list:
+        token = _random_str(TOKEN_LENGTH)
+    at = AppToken(user_id=User.objects.get(user_id=user_id),
+                  app_token=token,
+                  ttl=datetime.now() + timedelta(days=TOKEN_TTL_DATE))
+    at.save()
+    return at
+
+
+def _random_str(length, choice=''):
+    """指定の長さのランダム英数文字列"""
+    from random import choices
+    import string
+    if choice == '':
+        choice = string.ascii_letters + string.digits
+    return ''.join(choices(choice, k=length))
+
+
