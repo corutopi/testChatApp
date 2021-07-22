@@ -103,11 +103,11 @@ def logout(request):
     app_token = request.COOKIES.get('app_token')
     AppToken.objects.filter(user_id=User.objects.get(user_id=user_id),
                             app_token=app_token).delete()
-    hrr = redirect('chat:mypage')  # HttpResponseRedirect
+    hrr = redirect('chat:loggedout')  # HttpResponseRedirect
     # expire cookie
     hrr.set_cookie(key='app_token', value='', expires=datetime.now())
     hrr.set_cookie(key='user_id', value='', expires=datetime.now())
-    return redirect('chat:loggedout')
+    return hrr
 
 
 def loggedout(request):
