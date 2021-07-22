@@ -29,6 +29,7 @@ def login(request):
             #   1. リダイレクトURLのクエリストリングに埋め込む
             #   2. エラーメッセージ表示用のリダイレクト先URLを作成する
             #   3. そのほか何かいい方法ないか？
+            #   4. POSTする前にjavascriptでチェックを行う(できんのか？)
             pass
         return render(request, 'chat/login.html',
                       {'error_message': 'IDが登録されていないか、パスワードが間違っています。', })
@@ -71,7 +72,8 @@ def registered(request):
     return render(request, 'chat/registered.html')
 
 
-def check_logged_in(func):
+def _check_logged_in(func):
+    """認証デコレータ"""
     def warapper(*args, **kwargs):
         request = args[0]
         user_id = request.COOKIES.get('user_id')
@@ -86,15 +88,16 @@ def check_logged_in(func):
     return warapper
 
 
-@check_logged_in
+@_check_logged_in
 def mypage(request):
+    user_id = request.COOKIES.get('user_id')
     return HttpResponse('MyPage View')
 
 
 def _make_apptoken(user_id):
     """トークンを作成する"""
     TOKEN_LENGTH = 30
-    TOKEN_TTL_DATE = 7
+    TOKEN_TTL_DATE = 0.5
 
     us = AppToken.objects.filter(user_id=user_id)
     token_list = [u.app_token for u in us]

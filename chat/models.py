@@ -11,5 +11,5 @@ class User(models.Model):
 
 class AppToken(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    app_token = models.CharField(max_length=200)
+    app_token = models.CharField(max_length=200, primary_key=True)
     ttl = models.DateTimeField('date published')
