@@ -97,6 +97,23 @@ def mypage(request):
                   {'user_id': user_id})
 
 
+@_check_logged_in
+def logout(request):
+    user_id = request.COOKIES.get('user_id')
+    app_token = request.COOKIES.get('app_token')
+    AppToken.objects.filter(user_id=User.objects.get(user_id=user_id),
+                            app_token=app_token).delete()
+    hrr = redirect('chat:mypage')  # HttpResponseRedirect
+    # expire cookie
+    hrr.set_cookie(key='app_token', value='', expires=datetime.now())
+    hrr.set_cookie(key='user_id', value='', expires=datetime.now())
+    return redirect('chat:loggedout')
+
+
+def loggedout(request):
+    return render(request, 'chat/loggedout.html')
+
+
 def _make_apptoken(user_id):
     """トークンを作成する"""
     TOKEN_LENGTH = 30

@@ -6,5 +6,8 @@
 </head>
 <body>
 Hello {{ user_id }}.
+<form action="{% url 'chat:logout' %}" method="get">
+    <input type="submit" value="logout">
+</form>
 </body>
 </html>
