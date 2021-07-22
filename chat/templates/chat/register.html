@@ -13,10 +13,15 @@
 {% endif %}
 <form action="{% url 'chat:register' %}" method="post">
     {% csrf_token %}
-    <input type="text" name="id" id="id" value=""><br>
-    <input type="password" name="passwd" id="passwd" value=""><br>
-    <input type="password" name="passwd_renter" id="passwd_renter" value=""><br>
+    <table>
+        <tr><td>UserID</td><td><input type="text" name="id" id="id" value=""></td></tr>
+        <tr><td>Password</td><td><input type="password" name="passwd" id="passwd" value=""></td></tr>
+        <tr><td>Password(renter)</td><td><input type="password" name="passwd_renter" id="passwd_renter" value=""></td></tr>
+    </table>
     <input type="submit" value="register">
+</form>
+<form action="{% url 'chat:login' %}" method="get">
+    <input type="submit" value="login">
 </form>
 </body>
 </html>
