@@ -74,6 +74,7 @@ def registered(request):
 
 def _check_logged_in(func):
     """認証デコレータ"""
+
     def warapper(*args, **kwargs):
         request = args[0]
         user_id = request.COOKIES.get('user_id')
@@ -90,8 +91,10 @@ def _check_logged_in(func):
 
 @_check_logged_in
 def mypage(request):
+    template_mypage = 'chat/mypage.html'
     user_id = request.COOKIES.get('user_id')
-    return HttpResponse('MyPage View')
+    return render(request, template_mypage,
+                  {'user_id': user_id})
 
 
 def _make_apptoken(user_id):
